@@ -1,0 +1,11 @@
+ipython
+ipdb
+notebook
+
+jieba
+numpy
+matplotlib
+pandas
+scipy
+scikit-learn
+gensim
