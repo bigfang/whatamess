@@ -68,7 +68,14 @@ local_settings.py
 .python-version
 
 
+# ruby
+*.db
+*.sqlite
+*.log
+
+.rbenv-gemsets
+.ruby-version
+
 
 *.json
-*.sqlite
 *.sqlite3

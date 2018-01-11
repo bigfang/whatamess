@@ -1,0 +1,7 @@
+Gemfile.lock
+*.db
+*.sqlite
+*.log
+
+.rbenv-gemsets
+.ruby-version
