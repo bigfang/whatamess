@@ -1,0 +1,4 @@
+1. Please install node.js npm.
+2. Run command `npm install -g phantomjs casperjs`
+3. Run command `npm i`
+4. Fetch webpage by using `casperjs worker.js upc.ie`
