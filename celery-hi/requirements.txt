@@ -1,0 +1,8 @@
+requests
+pyquery
+peewee
+gevent
+psycopg2
+redis
+celery
+git+https://github.com/jaybaird/python-bloomfilter.git
