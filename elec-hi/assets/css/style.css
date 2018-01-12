@@ -1,0 +1,51 @@
+.sidebar {
+  position: fixed;
+  min-height: 698px;
+  padding: 20px;
+  background-color: #f5f5f5;
+}
+.nav-sidebar {
+  margin-right: -21px; /* 20px padding + 1px border */
+  margin-bottom: 20px;
+  margin-left: -20px;
+}
+.nav-sidebar > li > a {
+  padding-right: 20px;
+  padding-left: 20px;
+}
+.nn{
+  overflow-x:auto;
+  height: 180px;
+  border-bottom: 2px solid #999;
+}
+.fin{
+  padding-left: 90%
+}
+.nav-sidebar > .active > a,
+.nav-sidebar > .active > a:hover,
+.nav-sidebar > .active > a:focus {
+  color: #fff;
+  background-color: #428bca;
+}
+
+b{
+  font-size: large;
+}
+
+#main {
+  padding: 20px;
+}
+
+#main .web {
+  margin-top: 10px;
+}
+
+
+webview {
+  min-width: 800px;
+  min-height: 478px;
+}
+
+body {
+  overflow-y: hidden;
+}

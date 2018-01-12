@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>抓取配置生成工具</title>
+  <link href="assets/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/css/bootstrap-nav-wizard.css" rel="stylesheet">
+  <link href="assets/css/font-awesome.css" rel="stylesheet">
+  <link href="assets/css/style.css" rel="stylesheet">
+  <script src="render.js"></script>
+</head>
+
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-2 sidebar">
+        <ul class="nav nav-sidebar">
+          <li class="active"><a href="#"><i class="fa fa-wrench"></i> &nbsp;&nbsp;生成配置 <span class="sr-only">(current)</span></a></li>
+          <li><a href="edit.html"><i class="fa fa-pencil-square-o"></i> &nbsp;&nbsp;编辑配置</a></li>
+        </ul>
+      </div>
+
+      <div class="col-md-10 col-md-offset-2" id="main">
+        <div class="row nn">
+          <router-view></router-view>
+        </div>
+        <div class="row web">
+          <webview id="web-page" src="about:blank" preload="./inject.js" autosize="on" nodeintegration disablewebsecurity></webview>
+        </div>
+      <div class="row" id='edit' style="display: none">
+        <pre id="text" style="height: 300px">
+    example:
+      example:
+        example: Doe
+        example:
+          - John
+          - Jane
+        example:
+          - Paul
+          - Mark
+          - Simone
+        </pre>
+              
+        <script src="assets/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
+        <script>
+                var editor = ace.edit("text");
+                editor.setTheme("ace/theme/tomorrow");
+                editor.session.setMode("ace/mode/yaml");
+        </script>
+      </div>
+          <div class="col-md-offset-10" style="margin-top:10px" >
+              <button type="button" class="btn btn-primary" id="save-dialog">保存</button>
+              <button type="button" class="btn btn-info">上传</button>
+          </div>
+          <script>
+            const ipc = require('electron').ipcRenderer
+
+            const saveBtn = document.getElementById('save-dialog')
+            
+            saveBtn.addEventListener('click', function (event) {
+              ipc.send('save-dialog')
+            })
+            
+            ipc.on('saved-file', function (event, path) {
+              if (!path) path = ''
+              var editor = ace.edit("text");
+              var fs = require('fs');
+              var txt = editor.getValue();
+              var filename =  `${path}`
+
+              //写入文件
+              fs.writeFile(filename, txt, function (err) {
+                  if (err) throw err;
+                  console.log('保存成功'); //文件被保存
+              });
+            })
+          </script>
+      </div>
+    </div>
+  </div>
+
+  <template id="nav-step">
+    <ul class="nav nav-pills nav-wizard">
+      <li class="{{ act1 }}"><a @click='page1' data-toggle="tab">打开网页</a>
+        <div class="nav-arrow"></div>
+      </li>
+      <li class="{{ act2 }}">
+        <div class="nav-wedge"></div><a data-toggle="tab">选取列表页</a>
+        <div class="nav-arrow"></div>
+      </li>
+      <li class="{{ act3 }}">
+        <div class="nav-wedge"></div><a data-toggle="tab">设置翻页</a>
+        <div class="nav-arrow"></div>
+      </li>
+      <li class="{{ act4 }}">
+        <div class="nav-wedge"></div><a data-toggle="tab">选择抓取目标</a>
+        <div class="nav-arrow"></div>
+      </li>
+      <li class="{{ act5 }}">
+        <div class="nav-wedge"></div><a data-toggle="tab">生成配置</a>
+      </li>
+    </ul>
+  </template>
+
+  <template id="next-step">
+    <nav aria-label="...">
+      <ul class="pager">
+        <li class="next"><a @click="nextPage" v-link="step">下一步 <span aria-hidden="true">&rarr;</span></a></li>
+      </ul>
+    </nav>
+  </template>
+
+  <template id="step1">
+    <nav-step></nav-step>
+    <br>
+    <div class="col-md-7">
+      <div class="input-group">
+        <input v-model="loc" type="text" class="form-control" placeholder="http://">
+        <span class="input-group-btn">
+          <a @click="openURL" href="#!/step_2" class="btn btn-default" type="button">
+            <i class="fa fa-paper-plane"></i>&nbsp;&nbsp;访问
+          </a>
+        </span>
+      </div>
+    </div>
+
+    <br><br><br>
+    <next-step></next-step>
+  </template>
+
+
+  <template id="step2">
+    <nav-step></nav-step>
+    <br>
+    <div class="col-md-12">
+      <div class="input-group">
+        <textarea name="" id="list-target" cols="1200" rows="3" class="form-control"></textarea>
+      </div>
+    </div>
+
+    <br><br><br>
+    <next-step></next-step>
+  </template>
+
+  <template id="step3" url=''>
+    <nav-step></nav-step>
+    <br>
+    <div class="col-md-12" style="margin-bottom: -10px;margin-top: -15px">
+      <div class="alert alert-warning alert-dismissible" role="alert" id="3a">
+        <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        <strong>注意!</strong> 如果无需翻页，设置起始页等于结束页即可。点击连续<strong>两页</strong>链接后进行下一步。
+      </div>
+    </div>
+    <div class="col-md-3 ">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">起始页</span>
+        <input type="number" id='start' min="0" class="form-control" placeholder="Start" value="1">
+      </div>
+    </div>
+    <div class="col-md-3 col-md-offset-1">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">结束页</span>
+        <input type="number" id='end' min="0" class="form-control" placeholder="End">
+      </div>
+    </div>
+    <div class="col-md-3 col-md-offset-1">
+      <div class="input-group input-group-sm">
+        <span class="input-group-addon">步长</span>
+        <input type="number" id='step' class="form-control" placeholder="无需填写">
+      </div>
+    </div>
+
+    <br>
+    <next-step></next-step>
+  </template>
+
+  <template id="step4">
+    <nav-step></nav-step>
+    <br>
+    <table class="table table-bordered table-hover">
+      <thead>
+        <tr>
+          <td>设置字段名</td>
+          <td>点击提取选择器</td>
+        </tr>
+      </thead>
+      <tbody id='detail-target'>
+        
+      </tbody>
+    </table>
+    <next-step></next-step>
+  </template>
+
+  <template id="step5">
+    <nav-step></nav-step>
+    <br>
+    <div class="col-md-12">
+      <div class="input-group">
+        <span class="input-group-addon">任务名称</span>
+        <input type="text" class="form-control" placeholder="Taskname">
+      </div>
+    </div>
+
+    <br><br><br>
+    <next-step></next-step>
+  </template>
+
+  <res></res>
+
+  <script>
+    window.$ = window.jQuery = require('jquery');
+  </script>
+  <script src="assets/js/bootstrap.min.js"></script>
+  <script src="assets/js/scratch.js"></script>
+</body>
+
+</html>

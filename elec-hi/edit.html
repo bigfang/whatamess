@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>抓取配置生成工具</title>
+  <link href="assets/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/css/bootstrap-nav-wizard.css" rel="stylesheet">
+  <link href="assets/css/font-awesome.css" rel="stylesheet">
+  <link href="assets/css/style.css" rel="stylesheet">
+  <script src="assets/js/scratch.js"></script>
+  <!-- <script src="render.js"></script> -->
+  <style type="text/css" media="screen">
+    #text {
+      height: 400px;
+      margin: 0;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-2 sidebar">
+        <ul class="nav nav-sidebar">
+          <li><a href="index.html"><i class="fa fa-wrench"></i> &nbsp;&nbsp;生成配置 <span class="sr-only">(current)</span></a></li>
+          <li class="active"><a href="#"><i class="fa fa-pencil-square-o"></i> &nbsp;&nbsp;编辑配置</a></li>
+        </ul>
+      </div>
+
+      <div class="col-md-10 col-md-offset-2" id="main">
+        <div class="row">
+          <pre id="text">
+sleep: 2
+
+list:
+  init: "https://movie.douban.com/tag/动作?start=%s&type=T"
+  start: 0
+  end: 200
+  times: 20
+  detail-sel: .article table tr.item a.nbg
+
+detail:
+  - name: 电影名称
+    selector: "#content span[property=\"v:itemreviewed\"]"
+  - name: 评价数
+    selector: .rating_sum a span
+  - name: 豆瓣评分
+    selector: .ll.rating_num
+  - name: 简介
+    selector: "#link-report"
+  - name: 年份
+    selector: "#content .year"
+  - name: 导演
+    selector: "#info > span:eq(0)"
+  - name: 编剧
+    selector: "#info > span:eq(1)"
+  - name: 主演
+    selector: "#info > span:eq(2)"
+  - name: 其他信息
+    selector: "#info"
+
+          </pre>
+          
+          <script src="assets/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
+          <script>
+              var editor = ace.edit("text");
+              editor.setTheme("ace/theme/tomorrow");
+              editor.session.setMode("ace/mode/yaml");
+          </script>
+        </div>
+        <div class="col-md-offset-10" style="margin-top:10px" >
+            <button type="button" class="btn btn-primary" id="save-dialog">保存</button>
+            <button type="button" class="btn btn-info">上传</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const ipc = require('electron').ipcRenderer
+
+    const saveBtn = document.getElementById('save-dialog')
+    
+    saveBtn.addEventListener('click', function (event) {
+      ipc.send('save-dialog')
+    })
+    
+    ipc.on('saved-file', function (event, path) {
+      if (!path) path = ''
+      var editor = ace.edit("text");
+      var fs = require('fs');
+      var txt = editor.getValue();
+      var filename =  `${path}`
+
+      //写入文件
+      fs.writeFile(filename, txt, function (err) {
+          if (err) throw err;
+          console.log('保存成功'); //文件被保存
+      });
+    })
+  </script>
+  <script>
+    window.$ = window.jQuery = require('jquery');
+  </script>
+  <script src="assets/js/bootstrap.min.js"></script>
+  <script src="assets/js/scratch.js"></script>
+</body>
+
+</html>
